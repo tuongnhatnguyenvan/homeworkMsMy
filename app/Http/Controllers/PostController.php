@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Post;
-use Symfony\Component\HttpFoundation\Request;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use OpenApi\Annotations as OA;
 
 class PostController extends Controller
@@ -62,6 +63,23 @@ class PostController extends Controller
      */
     public function store(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|unique:posts|max:100|min:5',
+            'description' => 'required|max:50|min:10',
+        ], [
+            'title.required' => 'Title bắt buộc phải nhập',
+            'title.min' => 'Title phải từ :min ký tự trở lên',
+            'title.max' => 'Title phải từ :max ký tự trở lên',
+            'title.unique' => 'Title đã tồn tại trên hệ thống',
+            'description.required' => 'Description bắt buộc phải nhập',
+            'description.min' => 'Description phải từ :min ký tự trở lên',
+            'description.max' => 'Description phải từ :max ký tự trở lên',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return response()->json($errors, 412);
+        }
         $input = $request;
         $this->post->createPost($input);
         return response()->json(['msg' => 'Post created successfully']);
@@ -135,6 +153,23 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $validator = Validator::make($request->all(), [
+            'title' => 'required|unique:posts|max:100|min:5',
+            'description' => 'required|max:50|min:10',
+        ], [
+            'title.required' => 'Title bắt buộc phải nhập',
+            'title.min' => 'Title phải từ :min ký tự trở lên',
+            'title.max' => 'Title phải từ :max ký tự trở lên',
+            'title.unique' => 'Title đã tồn tại trên hệ thống',
+            'description.required' => 'Description bắt buộc phải nhập',
+            'description.min' => 'Description phải từ :min ký tự trở lên',
+            'description.max' => 'Description phải từ :max ký tự trở lên',
+        ]);
+
+        if ($validator->fails()) {
+            $errors = $validator->errors()->all();
+            return response()->json($errors, 412);
+        }
         $input = $request;
         $this->post->updatePost($id, $input);
         return response()->json(['msg' => 'Post updated successfully']);
